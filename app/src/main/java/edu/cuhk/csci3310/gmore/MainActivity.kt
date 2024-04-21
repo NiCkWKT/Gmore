@@ -3,69 +3,140 @@ package edu.cuhk.csci3310.gmore
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.fragment.app.Fragment
-import edu.cuhk.csci3310.gmore.databinding.ActivityMainBinding
-import edu.cuhk.csci3310.gmore.page.Account
-import edu.cuhk.csci3310.gmore.page.Bookmark
-import edu.cuhk.csci3310.gmore.page.Camera
-import edu.cuhk.csci3310.gmore.page.News
+import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
+import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import edu.cuhk.csci3310.gmore.ui.theme.GmoreTheme
 
-class MainActivity : AppCompatActivity() {
-    private lateinit var binding : ActivityMainBinding
+data class BottomNavigationItem(
+    val route: String,
+    val title: String,
+    val selectedIcon: Painter,
+    val unselectedIcon: Painter
+)
 
+class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        replaceFragment(News())
-
-        binding.bottomNavView.setOnItemSelectedListener {
-
-            when(it.itemId){
-
-                R.id.navigation_news -> replaceFragment(News())
-                R.id.navigation_account -> replaceFragment(Account())
-                R.id.navigation_bookmark -> replaceFragment(Bookmark())
-                R.id.navigation_camera -> replaceFragment(Camera())
-
-                else ->{
-
-                }
+        setContent {
+            GmoreTheme {
+                // A surface container using the 'background' color from the theme
+                MainScreen()
             }
-
-            true
-
         }
-//        setContent {
-//            GmoreTheme {
-//                // A surface container using the 'background' color from the theme
-//                Surface(
-//                    modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
-//                ) {
-//                    Greeting("Android")
-//                }
-//            }
-//        }
-    }
-
-    private fun replaceFragment(fragment: Fragment) {
-        val fragmentManager = supportFragmentManager
-        val fragmentTransaction = fragmentManager.beginTransaction()
-        fragmentTransaction.replace(R.id.frame_layout,fragment)
-        fragmentTransaction.commit()
-
-
     }
 }
+
+
+@Composable
+fun MainScreen() {
+    val navController = rememberNavController()
+    val navItems = listOf(
+        BottomNavigationItem(
+            route = BottomBarScreen.News.route,
+            title = "News",
+            selectedIcon = painterResource(id = R.drawable.filled_news_24),
+            unselectedIcon = painterResource(id = R.drawable.outline_news_24)
+        ),
+        BottomNavigationItem(
+            route = BottomBarScreen.Profile.route,
+            title = "Profile",
+            selectedIcon = painterResource(id = R.drawable.filled_account_24),
+            unselectedIcon = painterResource(id = R.drawable.outline_account_24)
+        ),
+        BottomNavigationItem(
+            route = BottomBarScreen.Bookmark.route,
+            title = "Bookmark",
+            selectedIcon = painterResource(id = R.drawable.filled_bookmark_24),
+            unselectedIcon = painterResource(id = R.drawable.outline_bookmark_24)
+        ),
+        BottomNavigationItem(
+            route = BottomBarScreen.Camera.route,
+            title = "Camera",
+            selectedIcon = painterResource(id = R.drawable.filled_camera_24),
+            unselectedIcon = painterResource(id = R.drawable.outline_camera_24)
+        ),
+    )
+    Surface(
+        modifier = Modifier.fillMaxSize(),
+        color = MaterialTheme.colorScheme.background
+    ) {
+//                    Greeting("Android")
+        Scaffold(
+            bottomBar = { BottomBar(navController = navController, navItems = navItems)}
+        ){
+            BottomNavGraph(navController = navController)
+        }
+    }
+}
+
+@Composable
+fun BottomBar(navController: NavHostController, navItems: List<BottomNavigationItem>) {
+    val navBackStackEntry by navController.currentBackStackEntryAsState()
+    val currentDestination = navBackStackEntry?.destination
+
+    NavigationBar {
+        navItems.forEach { screen ->
+            AddItem(
+                screen = screen,
+                currentDestination = currentDestination,
+                navController = navController
+            )
+        }
+    }
+}
+
+@Composable
+fun RowScope.AddItem(
+    screen: BottomNavigationItem,
+    currentDestination: NavDestination?,
+    navController: NavHostController
+) {
+    NavigationBarItem(
+        selected = currentDestination?.hierarchy?.any {
+            it.route == screen.route
+        } == true,
+        onClick = {
+            navController.navigate(screen.route) {
+                popUpTo(navController.graph.findStartDestination().id)
+                launchSingleTop = true
+            }},
+        label = {
+            Text(text = screen.title)
+        },
+        alwaysShowLabel = true,
+        icon = {
+            Icon(painter = if(currentDestination?.hierarchy?.any {
+                        it.route == screen.route
+                    } == true) {
+                screen.selectedIcon
+            } else screen.unselectedIcon,
+                contentDescription = screen.title)
+        })
+}
+
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
