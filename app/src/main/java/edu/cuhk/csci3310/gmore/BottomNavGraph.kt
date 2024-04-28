@@ -6,7 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import edu.cuhk.csci3310.gmore.screens.BookmarkScreen
-import edu.cuhk.csci3310.gmore.screens.CameraScreen
+import edu.cuhk.csci3310.gmore.screens.Camera.CameraScreen
+import edu.cuhk.csci3310.gmore.screens.Camera.LiveCameraScreen
 import edu.cuhk.csci3310.gmore.screens.NewsScreen
 import edu.cuhk.csci3310.gmore.screens.ProfileScreen
 
@@ -14,19 +15,22 @@ import edu.cuhk.csci3310.gmore.screens.ProfileScreen
 fun BottomNavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = BottomBarScreen.News.route
+        startDestination = ScreenRoute.News.route
     ) {
-        composable(route = BottomBarScreen.News.route) {
+        composable(route = ScreenRoute.News.route) {
             NewsScreen()
         }
-        composable(route = BottomBarScreen.Profile.route) {
+        composable(route = ScreenRoute.Profile.route) {
             ProfileScreen()
         }
-        composable(route = BottomBarScreen.Bookmark.route) {
+        composable(route = ScreenRoute.Bookmark.route) {
             BookmarkScreen()
         }
-        composable(route = BottomBarScreen.Camera.route) {
-            CameraScreen()
+        composable(route = ScreenRoute.Camera.route) {
+            CameraScreen(navController)
+        }
+        composable(route = ScreenRoute.LiveCamera.route) {
+            LiveCameraScreen()
         }
     }
 }

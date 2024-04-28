@@ -13,13 +13,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavDestination
@@ -55,25 +51,25 @@ fun MainScreen() {
     val navController = rememberNavController()
     val navItems = listOf(
         BottomNavigationItem(
-            route = BottomBarScreen.News.route,
+            route = ScreenRoute.News.route,
             title = "News",
             selectedIcon = painterResource(id = R.drawable.filled_news_24),
             unselectedIcon = painterResource(id = R.drawable.outline_news_24)
         ),
         BottomNavigationItem(
-            route = BottomBarScreen.Profile.route,
+            route = ScreenRoute.Profile.route,
             title = "Profile",
             selectedIcon = painterResource(id = R.drawable.filled_account_24),
             unselectedIcon = painterResource(id = R.drawable.outline_account_24)
         ),
         BottomNavigationItem(
-            route = BottomBarScreen.Bookmark.route,
+            route = ScreenRoute.Bookmark.route,
             title = "Bookmark",
             selectedIcon = painterResource(id = R.drawable.filled_bookmark_24),
             unselectedIcon = painterResource(id = R.drawable.outline_bookmark_24)
         ),
         BottomNavigationItem(
-            route = BottomBarScreen.Camera.route,
+            route = ScreenRoute.Camera.route,
             title = "Camera",
             selectedIcon = painterResource(id = R.drawable.filled_camera_24),
             unselectedIcon = painterResource(id = R.drawable.outline_camera_24)
@@ -86,7 +82,7 @@ fun MainScreen() {
 //                    Greeting("Android")
         Scaffold(
             bottomBar = { BottomBar(navController = navController, navItems = navItems)}
-        ){
+        ) {
             BottomNavGraph(navController = navController)
         }
     }
