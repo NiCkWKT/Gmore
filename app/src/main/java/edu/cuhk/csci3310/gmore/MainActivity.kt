@@ -18,12 +18,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import dagger.hilt.android.AndroidEntryPoint
+import edu.cuhk.csci3310.gmore.presentation.news.NewsViewModel
 import edu.cuhk.csci3310.gmore.ui.theme.GmoreTheme
 
 data class BottomNavigationItem(
@@ -33,6 +36,7 @@ data class BottomNavigationItem(
     val unselectedIcon: Painter
 )
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 @Composable
 fun MainScreen() {
     val navController = rememberNavController()
+    val newsViewModel = hiltViewModel<NewsViewModel>()
     val navItems = listOf(
         BottomNavigationItem(
             route = ScreenRoute.News.route,
@@ -83,7 +88,7 @@ fun MainScreen() {
         Scaffold(
             bottomBar = { BottomBar(navController = navController, navItems = navItems)}
         ) {
-            BottomNavGraph(navController = navController)
+            BottomNavGraph(navController = navController, newsViewModel = newsViewModel)
         }
     }
 }
