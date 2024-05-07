@@ -26,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -39,8 +40,9 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import edu.cuhk.csci3310.gmore.CameraActivity
 import edu.cuhk.csci3310.gmore.ScreenRoute
+import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 
-@OptIn(ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalPermissionsApi::class, ExperimentalStdlibApi::class)
 @Composable
 fun CameraScreen(navController: NavHostController) {
     val cameraPermissionState = rememberPermissionState(
@@ -88,7 +90,7 @@ fun CameraScreen(navController: NavHostController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Blue),
+            .background(OffWhite),
         contentAlignment = Alignment.Center
     ) {
         Column(
@@ -96,23 +98,23 @@ fun CameraScreen(navController: NavHostController) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Camera",
+                text = "OCR your text",
                 fontSize = MaterialTheme.typography.headlineMedium.fontSize,
                 fontWeight = FontWeight.Bold,
-                color = Color.White
+                color = Color.Black
             )
-            Button(onClick = {
-                if (!cameraPermissionState.status.isGranted) {
-                    cameraPermissionState.launchPermissionRequest();
-                    Log.d("myTag", "Ask permission")
-                } else {
-                    navController.navigate(ScreenRoute.LiveCamera.route) {
-                        launchSingleTop = true
-                    }
-                }
-            }) {
-                Text(text = "Camera with Tab Bar")
-            }
+//            Button(onClick = {
+//                if (!cameraPermissionState.status.isGranted) {
+//                    cameraPermissionState.launchPermissionRequest();
+//                    Log.d("myTag", "Ask permission")
+//                } else {
+//                    navController.navigate(ScreenRoute.LiveCamera.route) {
+//                        launchSingleTop = true
+//                    }
+//                }
+//            }) {
+//                Text(text = "Camera with Tab Bar")
+//            }
             Button(onClick = {
                 if (!cameraPermissionState.status.isGranted) {
                     cameraPermissionState.launchPermissionRequest();
@@ -120,7 +122,7 @@ fun CameraScreen(navController: NavHostController) {
                     cameraLauncher.launch(Intent(context, CameraActivity::class.java))
                 }
             }) {
-                Text(text = "Camera without Tab bar")
+                Text(text = "Take photo with Camera")
             }
             Button(onClick = {
                 photoPickerLauncher.launch(

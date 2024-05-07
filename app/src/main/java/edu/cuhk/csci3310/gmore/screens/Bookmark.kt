@@ -11,20 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 
 @Composable
 fun BookmarkScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Magenta),
+            .background(OffWhite),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "BOOKMARK",
             fontSize = MaterialTheme.typography.headlineMedium.fontSize,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.Black
         )
     }
 }

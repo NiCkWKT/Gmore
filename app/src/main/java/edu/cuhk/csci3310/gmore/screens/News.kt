@@ -11,20 +11,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 
 @Composable
 fun NewsScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.Red),
+            .background(OffWhite),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = "NEWS",
             fontSize = MaterialTheme.typography.headlineMedium.fontSize,
             fontWeight = FontWeight.Bold,
-            color = Color.White
+            color = Color.Black
         )
     }
 }
