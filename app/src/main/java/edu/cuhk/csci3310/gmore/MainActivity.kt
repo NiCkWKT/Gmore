@@ -3,8 +3,10 @@ package edu.cuhk.csci3310.gmore
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -84,11 +86,12 @@ fun MainScreen() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colorScheme.background
     ) {
-//                    Greeting("Android")
         Scaffold(
             bottomBar = { BottomBar(navController = navController, navItems = navItems)}
-        ) {
-            BottomNavGraph(navController = navController, newsViewModel = newsViewModel)
+        ) { innerPadding ->
+            Box(modifier = Modifier.padding(innerPadding)) {
+                BottomNavGraph(navController = navController, newsViewModel = newsViewModel)
+            }
         }
     }
 }
