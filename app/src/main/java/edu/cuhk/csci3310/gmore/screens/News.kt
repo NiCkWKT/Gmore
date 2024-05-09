@@ -3,6 +3,7 @@ package edu.cuhk.csci3310.gmore.screens
 import android.net.Uri
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,12 +16,18 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,25 +42,61 @@ import edu.cuhk.csci3310.gmore.data.api.model.NewsData
 import edu.cuhk.csci3310.gmore.presentation.news.NewsViewModel
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 
+
+data class TabItem(
+    val title: String,
+)
+
+val tabItems = listOf(
+    TabItem(title = "General"),
+    TabItem(title = "Sports"),
+    TabItem(title = "Entertainment"),
+    TabItem(title = "Tech"),
+    TabItem(title = "Business")
+)
+
 @Composable
 fun NewsScreen(newsViewModel: NewsViewModel) {
     val newsViewModel = newsViewModel
     val state by newsViewModel.newsApiResult.observeAsState()
 
-    LazyColumn {
-        if (state?.data.isNullOrEmpty()){
-            item {
-                CircularProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .wrapContentSize(align = Alignment.Center)
+    var selectedTabIndex by remember {
+        mutableIntStateOf(0)
+    }
+
+    Column (
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.Top
+    ) {
+        ScrollableTabRow(selectedTabIndex = selectedTabIndex) {
+            tabItems.forEachIndexed { index, tabItem ->
+                Tab(
+                    selected = index == selectedTabIndex,
+                    onClick = {
+                        selectedTabIndex = index
+                    },
+                    text = {
+                        Text(text = tabItem.title)
+                    }
                 )
             }
         }
 
-        state?.let {
-            items(it.data){ newsData: NewsData ->
-                NewsImageCard(newsData = newsData)
+        LazyColumn {
+            if (state?.data.isNullOrEmpty()){
+                item {
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .wrapContentSize(align = Alignment.Center)
+                    )
+                }
+            }
+
+            state?.let {
+                items(it.data){ newsData: NewsData ->
+                    NewsImageCard(newsData = newsData)
+                }
             }
         }
     }
@@ -102,7 +145,6 @@ fun NewsImageCard(newsData: NewsData) {
                 ) {
                     Text(text = "News Title: ${newsData.title}")
                     Text(text = "News Source: ${newsData.source}")
-
                 }
 
             }
