@@ -10,16 +10,31 @@ import android.webkit.URLUtil
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,7 +46,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import coil.compose.AsyncImage
@@ -40,7 +57,11 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import edu.cuhk.csci3310.gmore.CameraActivity
 import edu.cuhk.csci3310.gmore.ScreenRoute
+import edu.cuhk.csci3310.gmore.data.api.model.NewsData
+import edu.cuhk.csci3310.gmore.presentation.news.OcrViewModel
+import edu.cuhk.csci3310.gmore.screens.NewsImageCard
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
+import java.io.File
 
 @OptIn(ExperimentalPermissionsApi::class, ExperimentalStdlibApi::class)
 @Composable
@@ -52,6 +73,10 @@ fun CameraScreen(navController: NavHostController) {
     var selectedImageUri by remember {
         mutableStateOf<Uri?>(null)
     }
+    val ocrViewModel = hiltViewModel<OcrViewModel>()
+    val uiState = ocrViewModel.ocrUiState
+    val ocrSummaries by ocrViewModel.ocrSummaries.collectAsState()
+
     var takenPhoto by remember {
         mutableStateOf<Bitmap?>(null)
     }
@@ -93,6 +118,12 @@ fun CameraScreen(navController: NavHostController) {
             .background(OffWhite),
         contentAlignment = Alignment.Center
     ) {
+        LazyColumn {
+            items(ocrSummaries){ summary: String ->
+                Text(text = "Summary: ${summary}")
+            }
+
+        }
         Column(
             modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -115,6 +146,27 @@ fun CameraScreen(navController: NavHostController) {
 //            }) {
 //                Text(text = "Camera with Tab Bar")
 //            }
+
+            if (!(selectedImageUri == null || selectedImageUri == Uri.EMPTY)) {
+                IconButton(
+                    onClick = {
+                        val cacheFile = File(selectedImageUri.toString())
+                        ocrViewModel.getSummaries(cacheFile)
+                    },
+                    modifier = Modifier
+                        .padding(end = 10.dp, bottom = 10.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Red
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Send,
+                        contentDescription = "Send image to OCR"
+                    )
+                }
+            }
+
+
             Button(onClick = {
                 if (!cameraPermissionState.status.isGranted) {
                     cameraPermissionState.launchPermissionRequest();
@@ -138,6 +190,8 @@ fun CameraScreen(navController: NavHostController) {
                 contentDescription = null,
                 modifier = Modifier.fillMaxWidth(),
                 contentScale = ContentScale.Crop)
+
+
 
         }
     }
