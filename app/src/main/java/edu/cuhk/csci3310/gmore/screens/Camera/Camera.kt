@@ -21,7 +21,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Send
 import androidx.compose.material3.Button
@@ -58,6 +61,7 @@ import com.google.accompanist.permissions.rememberPermissionState
 import edu.cuhk.csci3310.gmore.CameraActivity
 import edu.cuhk.csci3310.gmore.ScreenRoute
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
+import edu.cuhk.csci3310.gmore.presentation.news.OcrUiState
 import edu.cuhk.csci3310.gmore.presentation.news.OcrViewModel
 import edu.cuhk.csci3310.gmore.screens.NewsImageCard
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
@@ -76,6 +80,8 @@ fun CameraScreen(navController: NavHostController) {
     val ocrViewModel = hiltViewModel<OcrViewModel>()
     val uiState = ocrViewModel.ocrUiState
     val ocrSummaries by ocrViewModel.ocrSummaries.collectAsState()
+
+    val scrollState = rememberScrollState()
 
     var takenPhoto by remember {
         mutableStateOf<Bitmap?>(null)
@@ -118,22 +124,22 @@ fun CameraScreen(navController: NavHostController) {
             .background(OffWhite),
         contentAlignment = Alignment.Center
     ) {
-        LazyColumn {
-            items(ocrSummaries){ summary: String ->
-                Text(text = "Summary: ${summary}")
-            }
 
-        }
+
+
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "OCR your text",
-                fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black
-            )
+            if (selectedImageUri == null || selectedImageUri == Uri.EMPTY) {
+                Text(
+                    text = "OCR your text",
+                    fontSize = MaterialTheme.typography.headlineMedium.fontSize,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
 //            Button(onClick = {
 //                if (!cameraPermissionState.status.isGranted) {
 //                    cameraPermissionState.launchPermissionRequest();
@@ -147,14 +153,61 @@ fun CameraScreen(navController: NavHostController) {
 //                Text(text = "Camera with Tab Bar")
 //            }
 
+
+                Button(onClick = {
+                    if (!cameraPermissionState.status.isGranted) {
+                        cameraPermissionState.launchPermissionRequest();
+                    } else {
+                        cameraLauncher.launch(Intent(context, CameraActivity::class.java))
+                    }
+                }) {
+                    Text(text = "Take photo with Camera")
+                }
+                Button(onClick = {
+                    photoPickerLauncher.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+
+                }) {
+                    Text(text = "Select photo from album")
+                }
+            }
+
+
+
+
             if (!(selectedImageUri == null || selectedImageUri == Uri.EMPTY)) {
+                IconButton(
+                    onClick = {
+                        selectedImageUri = null
+                    },
+                    modifier = Modifier
+                        .align(alignment = Alignment.Start)
+                        .padding(top = 10.dp, start = 10.dp, bottom = 10.dp),
+                    colors = IconButtonDefaults.iconButtonColors(
+                        containerColor = Color.Gray
+                    )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close Photo"
+                    )
+                }
+
+                AsyncImage(
+                    model = selectedImageUri,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxWidth(),
+                    contentScale = ContentScale.Crop
+                )
                 IconButton(
                     onClick = {
                         val cacheFile = File(selectedImageUri.toString())
                         ocrViewModel.getSummaries(cacheFile)
                     },
                     modifier = Modifier
-                        .padding(end = 10.dp, bottom = 10.dp),
+                        .align(alignment = Alignment.End)
+                        .padding(top = 10.dp, end = 10.dp, bottom = 10.dp),
                     colors = IconButtonDefaults.iconButtonColors(
                         containerColor = Color.Red
                     )
@@ -164,36 +217,48 @@ fun CameraScreen(navController: NavHostController) {
                         contentDescription = "Send image to OCR"
                     )
                 }
-            }
 
+                when(uiState) {
+                    is OcrUiState.Loading -> {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(align = Alignment.Center)
+                        )
+                    }
 
-            Button(onClick = {
-                if (!cameraPermissionState.status.isGranted) {
-                    cameraPermissionState.launchPermissionRequest();
-                } else {
-                    cameraLauncher.launch(Intent(context, CameraActivity::class.java))
+                    is OcrUiState.Success -> {
+                        ocrSummaries.forEach { summary: String ->
+                            Text(text = "Summary: ${summary}", color = Color.Black)
+                        }
+                    }
+
+                    is OcrUiState.Error -> {
+                        Text(text = "Server Error", color = Color.Black)
+                    }
+
+                    is OcrUiState.Empty -> { }
                 }
-            }) {
-                Text(text = "Take photo with Camera")
-            }
-            Button(onClick = {
-                photoPickerLauncher.launch(
-                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                )
-
-            }) {
-                Text(text = "Select photo from album")
             }
 
-            AsyncImage(
-                model = selectedImageUri,
-                contentDescription = null,
-                modifier = Modifier.fillMaxWidth(),
-                contentScale = ContentScale.Crop)
-
-
+//            if (uiState == OcrUiState.Loading) {
+//                CircularProgressIndicator(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .wrapContentSize(align = Alignment.Center)
+//                )
+//            }
+//            if (uiState.) {
+//                ocrSummaries.forEach(
+//                    summary: String ->
+//                    Text(text = "Summary: ${summary}")
+//                )
+//
+//            }
 
         }
+
+
     }
 }
 

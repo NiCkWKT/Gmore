@@ -11,8 +11,8 @@ import javax.inject.Inject
 class NewsRepo @Inject constructor(
     private val newsApi: NewsApi
 ){
-    suspend fun getNews(): ApiResult {
-        return newsApi.getNews("tech")
+    suspend fun getNews(category: String): ApiResult {
+        return newsApi.getNews(category)
     }
 
     suspend fun postImgOcr(image: OcrEntity): OcrApiResult {

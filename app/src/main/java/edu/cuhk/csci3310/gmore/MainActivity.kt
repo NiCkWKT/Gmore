@@ -63,12 +63,12 @@ fun MainScreen() {
             selectedIcon = painterResource(id = R.drawable.filled_news_24),
             unselectedIcon = painterResource(id = R.drawable.outline_news_24)
         ),
-        BottomNavigationItem(
-            route = ScreenRoute.Profile.route,
-            title = "Profile",
-            selectedIcon = painterResource(id = R.drawable.filled_account_24),
-            unselectedIcon = painterResource(id = R.drawable.outline_account_24)
-        ),
+//        BottomNavigationItem(
+//            route = ScreenRoute.Profile.route,
+//            title = "Profile",
+//            selectedIcon = painterResource(id = R.drawable.filled_account_24),
+//            unselectedIcon = painterResource(id = R.drawable.outline_account_24)
+//        ),
         BottomNavigationItem(
             route = ScreenRoute.Bookmark.route,
             title = "Bookmark",

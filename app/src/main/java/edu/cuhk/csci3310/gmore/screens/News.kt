@@ -39,7 +39,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
+import edu.cuhk.csci3310.gmore.presentation.news.NewsUiState
 import edu.cuhk.csci3310.gmore.presentation.news.NewsViewModel
+import edu.cuhk.csci3310.gmore.presentation.news.OcrUiState
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 
 
@@ -57,8 +59,8 @@ val tabItems = listOf(
 
 @Composable
 fun NewsScreen(newsViewModel: NewsViewModel) {
-    val newsViewModel = newsViewModel
-    val state by newsViewModel.newsApiResult.observeAsState()
+    val uiState = newsViewModel.newsUiState
+    val news by newsViewModel.news.collectAsState()
 
     var selectedTabIndex by remember {
         mutableIntStateOf(0)
@@ -83,19 +85,33 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
         }
 
         LazyColumn {
-            if (state?.data.isNullOrEmpty()){
-                item {
-                    CircularProgressIndicator(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(align = Alignment.Center)
-                    )
+            when(uiState) {
+                is NewsUiState.Loading -> {
+                    item {
+                        CircularProgressIndicator(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .wrapContentSize(align = Alignment.Center)
+                                .padding(top = 10.dp)
+                        )
+                    }
                 }
-            }
 
-            state?.let {
-                items(it.data){ newsData: NewsData ->
-                    NewsImageCard(newsData = newsData)
+                is NewsUiState.Success -> {
+                    items(news){ newsData: NewsData ->
+                        NewsImageCard(newsData = newsData)
+                    }
+                }
+
+                is NewsUiState.Error -> {
+                    item {
+                        Text(text = "Cannot Connect to internet", color = Color.Black)
+                        Text(text = "Please retry later", color = Color.Black)
+                    }
+                }
+
+                is NewsUiState.Empty -> {
+
                 }
             }
         }

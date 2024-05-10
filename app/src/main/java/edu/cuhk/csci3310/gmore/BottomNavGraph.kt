@@ -21,9 +21,9 @@ fun BottomNavGraph(navController: NavHostController, newsViewModel: NewsViewMode
         composable(route = ScreenRoute.News.route) {
             NewsScreen(newsViewModel)
         }
-        composable(route = ScreenRoute.Profile.route) {
-            ProfileScreen()
-        }
+//        composable(route = ScreenRoute.Profile.route) {
+//            ProfileScreen()
+//        }
         composable(route = ScreenRoute.Bookmark.route) {
             BookmarkScreen()
         }

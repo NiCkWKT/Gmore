@@ -31,7 +31,7 @@ class OcrViewModel @Inject constructor(
     private val _ocrSummaries = MutableStateFlow(emptyList<String>())
     val ocrSummaries: StateFlow<List<String>>
         get() = _ocrSummaries
-    private var _ocrUiState: OcrUiState by mutableStateOf(OcrUiState.Loading)
+    private var _ocrUiState: OcrUiState by mutableStateOf(OcrUiState.Empty)
     val ocrUiState: OcrUiState
         get() = _ocrUiState
 

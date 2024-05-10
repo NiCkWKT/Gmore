@@ -2,6 +2,7 @@ package edu.cuhk.csci3310.gmore
 
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Matrix
 import android.net.Uri
 import android.os.Bundle
 import android.util.Log
@@ -121,6 +122,7 @@ class CameraActivity : ComponentActivity() {
                                     savePhotoToInternalStorage("imageTaken", it)
                                     val intent = Intent()
                                     intent.putExtra("IMAGEURI", photoUri.toString())
+                                    Log.d("Gmoretag", photoUri.toString())
                                     setResult(RESULT_OK, intent)
                                     finish()
                                 }
@@ -163,7 +165,31 @@ class CameraActivity : ComponentActivity() {
             object: OnImageCapturedCallback() {
                 override fun onCaptureSuccess(image: ImageProxy) {
                     super.onCaptureSuccess(image)
-                    onPhotoTaken(image.toBitmap())
+
+//                    rotate photo to correct display
+                    val matrix = Matrix().apply{
+                        postRotate(image.imageInfo.rotationDegrees.toFloat())
+                    }
+
+                    if(controller.cameraSelector == CameraSelector.DEFAULT_FRONT_CAMERA) {
+                        matrix.apply {
+                            postScale(-1f,1f)
+                        }
+                    }
+
+
+                    val rotatedBitmap = Bitmap.createBitmap(
+                        image.toBitmap(),
+                        0,
+                        0,
+                        image.width,
+                        image.height,
+                        matrix,
+                        true
+                    )
+
+
+                    onPhotoTaken(rotatedBitmap)
                 }
 
                 override fun onError(exception: ImageCaptureException) {
