@@ -255,14 +255,7 @@ fun NewsCard(newsData: NewsData) {
                     .padding(horizontal = 3.dp)
                     .fillMaxHeight(),
                 ){
-                Text(
-                    text = "★Smart View",
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = Color.Black,
-                    fontSize = MaterialTheme.typography.titleSmall.fontSize,
-                    fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
-                )
+
 
                 NewsSummaryView(newsData.summary)
             }
@@ -272,6 +265,15 @@ fun NewsCard(newsData: NewsData) {
 
 @Composable
 public fun NewsSummaryView(newsDataSummary: List<String>) {
+    Text(
+        text = "★Smart View",
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        color = Color.Black,
+        fontSize = MaterialTheme.typography.titleSmall.fontSize,
+        fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
+    )
+
     for (i in newsDataSummary.indices) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(

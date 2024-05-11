@@ -123,7 +123,9 @@ fun RowScope.AddItem(
             it.route == screen.route
         } == true,
         onClick = {
-            navController.navigate(screen.route) {
+            if(currentDestination?.hierarchy?.any {
+                it.route == screen.route
+            } != true) navController.navigate(screen.route) {
                 popUpTo(navController.graph.findStartDestination().id)
                 launchSingleTop = true
             }},

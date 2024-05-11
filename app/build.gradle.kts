@@ -79,12 +79,12 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("androidx.compose.runtime:runtime-livedata:1.0.0-beta01")
+    implementation("androidx.compose.runtime:runtime-livedata:1.6.7")
 
 
     implementation("com.google.accompanist:accompanist-permissions:0.31.0-alpha")
 //   Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.4.0-alpha10")
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
 //    camera X
     val cameraxVersion = "1.3.0-rc01"

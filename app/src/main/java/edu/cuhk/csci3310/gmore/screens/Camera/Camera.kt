@@ -74,6 +74,7 @@ import edu.cuhk.csci3310.gmore.screens.NewsImageCard
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 import androidx.compose.runtime.saveable.rememberSaveable
 import edu.cuhk.csci3310.gmore.screens.NewsSummaryView
+import edu.cuhk.csci3310.gmore.ui.theme.TransparentGray
 
 import java.io.File
 
@@ -101,6 +102,7 @@ fun CameraScreen(navController: NavHostController) {
     var imageSource by remember {
         mutableStateOf<ImageSource?>(null)
     }
+    Log.d("Gmore","selectedImageUri:" + selectedImageUri.toString() );
 
 
     val photoPickerLauncher = rememberLauncherForActivityResult(
@@ -269,12 +271,20 @@ fun CameraScreen(navController: NavHostController) {
                     }
 
                     is OcrUiState.Error -> {
-                        Text(text = "Server Error", color = Color.Black)
+                        Text(text = "Image file is too large to server", color = Color.Black)
                     }
 
                     is OcrUiState.Empty -> { }
                 }
             }
+        }
+        if (uiState == OcrUiState.Loading) {
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(TransparentGray)
+                    .wrapContentSize(align = Alignment.Center)
+            )
         }
 
     }
