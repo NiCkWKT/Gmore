@@ -5,6 +5,7 @@ import edu.cuhk.csci3310.gmore.data.api.model.ApiResult
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
 import edu.cuhk.csci3310.gmore.data.api.model.OcrApiResult
 import edu.cuhk.csci3310.gmore.data.api.model.OcrEntity
+import okhttp3.MultipartBody
 import java.io.File
 import javax.inject.Inject
 
@@ -15,7 +16,7 @@ class NewsRepo @Inject constructor(
         return newsApi.getNews(category)
     }
 
-    suspend fun postImgOcr(image: OcrEntity): OcrApiResult {
+    suspend fun postImgOcr(image: MultipartBody.Part): OcrApiResult {
         return newsApi.postImgOcr(image)
     }
 }

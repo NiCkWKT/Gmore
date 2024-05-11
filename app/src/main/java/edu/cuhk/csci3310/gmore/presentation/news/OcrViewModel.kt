@@ -1,5 +1,6 @@
 package edu.cuhk.csci3310.gmore.presentation.news
 
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,6 +15,10 @@ import edu.cuhk.csci3310.gmore.data.repository.NewsRepo
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import okhttp3.MediaType
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 import java.io.File
 import javax.inject.Inject
 
@@ -36,14 +41,18 @@ class OcrViewModel @Inject constructor(
         get() = _ocrUiState
 
 
-    public fun getSummaries(image: File) {
+    public fun getSummaries(file: File) {
         viewModelScope.launch {
             _ocrUiState = OcrUiState.Loading
+
             _ocrUiState = try {
-                val ocrImage = OcrEntity(image)
-                val apiResult = newsRepo.postImgOcr(ocrImage)
+                val requestFile = RequestBody.create("image/*".toMediaTypeOrNull(), file)
+                val imagePart = MultipartBody.Part.createFormData("image", file.name, requestFile)
+
+                val apiResult = newsRepo.postImgOcr(imagePart)
                 if (apiResult.success) {
                     _ocrSummaries.value = apiResult.data
+                    Log.d("Gmore", apiResult.data.toString())
                     OcrUiState.Success(apiResult.data)
                 } else {
                     throw Exception(apiResult.message)
