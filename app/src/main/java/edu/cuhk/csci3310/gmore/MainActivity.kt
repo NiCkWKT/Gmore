@@ -126,8 +126,11 @@ fun RowScope.AddItem(
             if(currentDestination?.hierarchy?.any {
                 it.route == screen.route
             } != true) navController.navigate(screen.route) {
-                popUpTo(navController.graph.findStartDestination().id)
+                popUpTo(navController.graph.findStartDestination().id) {
+                    saveState = true
+                }
                 launchSingleTop = true
+                restoreState = true
             }},
         label = {
             Text(text = screen.title)
