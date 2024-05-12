@@ -1,6 +1,7 @@
 package edu.cuhk.csci3310.gmore.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -99,6 +100,7 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
                         selected = index == selectedTabIndex,
                         onClick = {
                             selectedTabIndex = index
+                            newsViewModel.getNews(tabItem.title.lowercase())
                         },
                         text = {
                             if(index == selectedTabIndex) {
@@ -165,41 +167,41 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
 //    }
 }
 
-@Composable
-fun NewsImageCard(newsData: NewsData) {
-    val imagerPainter = rememberAsyncImagePainter(model = Uri.parse(newsData.image_url))
-
-    Card(
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        Box{
-            Image(painter = imagerPainter,
-                contentDescription = "newsImage",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp),
-                contentScale = ContentScale.FillBounds
-            )
-
-            Surface (
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .3f),
-                modifier = Modifier.align(Alignment.BottomCenter),
-                contentColor = MaterialTheme.colorScheme.surface
-            ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(4.dp)
-                ) {
-                    Text(text = "News Title: ${newsData.title}")
-                    Text(text = "News Source: ${newsData.source}")
-                }
-
-            }
-        }
-    }
-}
+//@Composable
+//fun NewsImageCard(newsData: NewsData) {
+//    val imagerPainter = rememberAsyncImagePainter(model = Uri.parse(newsData.image_url))
+//
+//    Card(
+//        shape = MaterialTheme.shapes.medium,
+//        modifier = Modifier.padding(16.dp)
+//    ) {
+//        Box{
+//            Image(painter = imagerPainter,
+//                contentDescription = "newsImage",
+//                modifier = Modifier
+//                    .fillMaxWidth()
+//                    .height(200.dp),
+//                contentScale = ContentScale.FillBounds
+//            )
+//
+//            Surface (
+//                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .3f),
+//                modifier = Modifier.align(Alignment.BottomCenter),
+//                contentColor = MaterialTheme.colorScheme.surface
+//            ) {
+//                Column(
+//                    modifier = Modifier
+//                        .fillMaxSize()
+//                        .padding(4.dp)
+//                ) {
+//                    Text(text = "News Title: ${newsData.title}")
+//                    Text(text = "News Source: ${newsData.source}")
+//                }
+//
+//            }
+//        }
+//    }
+//}
 
 
 @Composable

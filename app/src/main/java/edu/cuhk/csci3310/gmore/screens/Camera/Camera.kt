@@ -70,7 +70,6 @@ import edu.cuhk.csci3310.gmore.ScreenRoute
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
 import edu.cuhk.csci3310.gmore.presentation.news.OcrUiState
 import edu.cuhk.csci3310.gmore.presentation.news.OcrViewModel
-import edu.cuhk.csci3310.gmore.screens.NewsImageCard
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 import androidx.compose.runtime.saveable.rememberSaveable
 import edu.cuhk.csci3310.gmore.screens.NewsSummaryView
@@ -205,6 +204,7 @@ fun CameraScreen(navController: NavHostController) {
                 IconButton(
                     onClick = {
                         selectedImageUri = null
+                        ocrViewModel.clear()
                     },
                     modifier = Modifier
                         .align(alignment = Alignment.Start)
@@ -259,11 +259,11 @@ fun CameraScreen(navController: NavHostController) {
 
                 when(uiState) {
                     is OcrUiState.Loading -> {
-                        CircularProgressIndicator(
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .wrapContentSize(align = Alignment.Center)
-                        )
+//                        CircularProgressIndicator(
+//                            modifier = Modifier
+//                                .fillMaxSize()
+//                                .wrapContentSize(align = Alignment.Center)
+//                        )
                     }
 
                     is OcrUiState.Success -> {

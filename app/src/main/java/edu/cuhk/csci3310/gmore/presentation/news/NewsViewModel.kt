@@ -36,7 +36,7 @@ class NewsViewModel @Inject constructor(
     val newsUiState: NewsUiState
         get() = _newsUiState
 
-    private fun getNews(category: String = "tech") {
+    fun getNews(category: String = "tech") {
         viewModelScope.launch {
             _newsUiState = NewsUiState.Loading
             _newsUiState = try {
