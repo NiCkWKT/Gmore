@@ -28,7 +28,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
-import edu.cuhk.csci3310.gmore.presentation.news.NewsViewModel
+import edu.cuhk.csci3310.gmore.news_list.NewsViewModel
 import edu.cuhk.csci3310.gmore.ui.theme.GmoreTheme
 
 data class BottomNavigationItem(

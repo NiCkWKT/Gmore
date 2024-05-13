@@ -1,7 +1,6 @@
-package edu.cuhk.csci3310.gmore.screens
+package edu.cuhk.csci3310.gmore.news_list
 
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,24 +18,18 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -46,15 +39,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
-import edu.cuhk.csci3310.gmore.presentation.news.NewsUiState
-import edu.cuhk.csci3310.gmore.presentation.news.NewsViewModel
-import edu.cuhk.csci3310.gmore.presentation.news.OcrUiState
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 import edu.cuhk.csci3310.gmore.ui.theme.DarkBrown
 
@@ -103,12 +90,12 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
                             newsViewModel.getNews(tabItem.title.lowercase())
                         },
                         text = {
-                            if(index == selectedTabIndex) {
+                            if (index == selectedTabIndex) {
                                 Text(
                                     text = tabItem.title,
                                     color = DarkBrown,
                                     fontWeight = FontWeight.Bold,
-                                    )
+                                )
                             } else {
                                 Text(text = tabItem.title)
                             }
@@ -151,58 +138,7 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
             }
         }
     }
-
-//    Box(
-//        modifier = Modifier
-//            .fillMaxSize()
-//            .background(OffWhite),
-//        contentAlignment = Alignment.Center
-//    ) {
-//        Text(
-//            text = "NEWS",
-//            fontSize = MaterialTheme.typography.headlineMedium.fontSize,
-//            fontWeight = FontWeight.Bold,
-//            color = Color.Black
-//        )
-//    }
 }
-
-//@Composable
-//fun NewsImageCard(newsData: NewsData) {
-//    val imagerPainter = rememberAsyncImagePainter(model = Uri.parse(newsData.image_url))
-//
-//    Card(
-//        shape = MaterialTheme.shapes.medium,
-//        modifier = Modifier.padding(16.dp)
-//    ) {
-//        Box{
-//            Image(painter = imagerPainter,
-//                contentDescription = "newsImage",
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .height(200.dp),
-//                contentScale = ContentScale.FillBounds
-//            )
-//
-//            Surface (
-//                color = MaterialTheme.colorScheme.onSurface.copy(alpha = .3f),
-//                modifier = Modifier.align(Alignment.BottomCenter),
-//                contentColor = MaterialTheme.colorScheme.surface
-//            ) {
-//                Column(
-//                    modifier = Modifier
-//                        .fillMaxSize()
-//                        .padding(4.dp)
-//                ) {
-//                    Text(text = "News Title: ${newsData.title}")
-//                    Text(text = "News Source: ${newsData.source}")
-//                }
-//
-//            }
-//        }
-//    }
-//}
-
 
 @Composable
 fun NewsCard(newsData: NewsData) {
@@ -214,6 +150,7 @@ fun NewsCard(newsData: NewsData) {
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column{
+            // News Image
             Image(painter = imagerPainter,
                 contentDescription = "newsImage",
                 modifier = Modifier
@@ -222,6 +159,7 @@ fun NewsCard(newsData: NewsData) {
                 contentScale = ContentScale.FillBounds,
             )
 
+            // News source and "More" button
             Row( verticalAlignment = Alignment.CenterVertically){
                 Text(text = "Source: ${newsData.source}",
                     modifier = Modifier.padding(start = 3.dp),
@@ -237,14 +175,14 @@ fun NewsCard(newsData: NewsData) {
                         .background(Color.Transparent))
 
                 Button(
-                    onClick = { /*TODO*/ },
+                    onClick = { /*TODO*/ }, // TODO: Navigate to the news detail
                     colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
                 ) {
                     Text(text = "More >", color = Color.Gray)
                 }
             }
 
-//            Title
+            // News Title
             Text(text = newsData.title,
                 modifier = Modifier.padding(start = 3.dp),
                 overflow = TextOverflow.Ellipsis,
@@ -256,8 +194,7 @@ fun NewsCard(newsData: NewsData) {
                 modifier = Modifier
                     .padding(horizontal = 3.dp)
                     .fillMaxHeight(),
-                ){
-
+                ) {
 
                 NewsSummaryView(newsData.summary)
             }
@@ -266,7 +203,7 @@ fun NewsCard(newsData: NewsData) {
 }
 
 @Composable
-public fun NewsSummaryView(newsDataSummary: List<String>) {
+fun NewsSummaryView(newsDataSummary: List<String>) {
     Text(
         text = "★Smart View",
         maxLines = 1,
@@ -276,6 +213,7 @@ public fun NewsSummaryView(newsDataSummary: List<String>) {
         fontWeight = MaterialTheme.typography.titleSmall.fontWeight,
     )
 
+    // Summary bullet points
     for (i in newsDataSummary.indices) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Spacer(
@@ -313,23 +251,23 @@ public fun NewsSummaryView(newsDataSummary: List<String>) {
     }
 }
 
-@Composable
-@Preview
-fun NewsCardPreview() {
-    val sample = NewsData(
-         "4f6d4822-a8b5-44e4-95b8-096f1174b347",
-     "Best VPN for Netflix in 2024",
-     "2024-04-21T12:15:00.000000Z",
-    "https://www.cnet.com/a/img/resize/87f3c1d184710c78492dacfa8fd6cd98d2ad8ab0/hub/2024/02/02/6793dbef-dc32-478a-b984-10e3e10c6a20/netflix-streaming-logo-phone-6405.jpg?auto=webp&fit=crop&height=675&width=1200",
-    "cnet.com",
-    "https://www.cnet.com/tech/services-and-software/best-vpn-for-netflix/#ftag=CAD590a51e",
-     "tech",
-     listOf<String>(
-    "Consider the streaming services you want to unblock, and choose a VPN that supports those platforms.",
-    "Look for a VPN with a large server network, offering multiple servers in target countries to increase the chances of unblocking geo-restricted content.",
-    "Choose a VPN with fast speeds, strong privacy features, and device compatibility that meets your needs."
-     )
-    )
-
-    NewsCard(sample)
-}
+//@Preview
+//@Composable
+//fun NewsCardPreview() {
+//    val sample = NewsData(
+//         "4f6d4822-a8b5-44e4-95b8-096f1174b347",
+//     "Best VPN for Netflix in 2024",
+//     "2024-04-21T12:15:00.000000Z",
+//    "https://www.cnet.com/a/img/resize/87f3c1d184710c78492dacfa8fd6cd98d2ad8ab0/hub/2024/02/02/6793dbef-dc32-478a-b984-10e3e10c6a20/netflix-streaming-logo-phone-6405.jpg?auto=webp&fit=crop&height=675&width=1200",
+//    "cnet.com",
+//    "https://www.cnet.com/tech/services-and-software/best-vpn-for-netflix/#ftag=CAD590a51e",
+//     "tech",
+//     listOf<String>(
+//    "Consider the streaming services you want to unblock, and choose a VPN that supports those platforms.",
+//    "Look for a VPN with a large server network, offering multiple servers in target countries to increase the chances of unblocking geo-restricted content.",
+//    "Choose a VPN with fast speeds, strong privacy features, and device compatibility that meets your needs."
+//     )
+//    )
+//
+//    NewsCard(sample)
+//}
