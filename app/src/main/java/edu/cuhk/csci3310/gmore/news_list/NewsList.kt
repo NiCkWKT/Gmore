@@ -235,12 +235,9 @@ fun NewsCard(
                         .fillMaxHeight()
                         .background(Color.Transparent))
 
-                Button(
-                    onClick = { /*TODO*/ }, // TODO: Navigate to the news detail
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent)
-                ) {
-                    Text(text = "More >", color = Color.Gray)
-                }
+
+                Text(text = "More >", color = Color.Gray)
+
             }
 
             // News Title
