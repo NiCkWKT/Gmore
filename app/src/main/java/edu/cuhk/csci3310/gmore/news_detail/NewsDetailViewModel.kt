@@ -52,6 +52,8 @@ class NewsDetailViewModel @Inject constructor(
     var id by mutableStateOf("")
         private set
 
+    var category by mutableStateOf("")
+        private set
     var title by mutableStateOf("")
         private set
 
@@ -127,6 +129,7 @@ class NewsDetailViewModel @Inject constructor(
 //                        _news.value = newsApiResult.data
                         Log.d(TAG, "NewsDetailViewModel getNews success: ${newsApiResult.data}")
                         id = newsApiResult.data.id
+                        category = newsApiResult.data.category
                         title = newsApiResult.data.title
                         publishedDate = newsApiResult.data.published_at
                         imageUrl = newsApiResult.data.image_url
