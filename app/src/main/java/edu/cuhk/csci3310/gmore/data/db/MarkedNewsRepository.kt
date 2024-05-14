@@ -7,6 +7,6 @@ interface MarkedNewsRepository {
 
     suspend fun deleteNews(news: MarkedNews)
 
-    suspend fun getNewsById(id: Int): MarkedNews?
+    suspend fun getNewsById(id: String): MarkedNews?
 
     fun getAllMarkedNews(): Flow<List<MarkedNews>>}

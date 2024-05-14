@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -21,6 +22,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -30,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import edu.cuhk.csci3310.gmore.data.db.MarkedNews
 import edu.cuhk.csci3310.gmore.util.UiEvent
 
 
@@ -50,7 +53,7 @@ fun NewsDetailScreen(
     }
 
     val uiState = viewModel.newsUiState
-//    val news by viewModel.news.collectAsState()
+//    val news by viewModel.news.()
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
     val imagePainter = rememberAsyncImagePainter(model = Uri.parse(viewModel.imageUrl))
@@ -74,7 +77,9 @@ fun NewsDetailScreen(
                 },
                 navigationIcon = {
                     // TODO: Pop backstack
-                    IconButton(onClick = { /* do something */ }) {
+                    IconButton(onClick = {
+                        viewModel.onEvent(NewsDetailEvent.onBackClick)
+                    }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
                             contentDescription = "Localized description"
@@ -83,12 +88,23 @@ fun NewsDetailScreen(
                 },
                 actions = {
                     // TODO: add to bookmark
-                    IconButton(onClick = { /* do something */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.FavoriteBorder,
-                            contentDescription = "Bookmark bar"
-                        )
-                    }
+                    val markedNews = MarkedNews(
+                        id = viewModel.id,
+                        title = viewModel.title,
+                        imageUrl = viewModel.imageUrl,
+                        source = viewModel.source,
+                        sourceUrl = viewModel.sourceUrl,
+                        publishedDate = viewModel.publishedDate,
+                        summary1 = viewModel.point1,
+                        summary2 = viewModel.point2,
+                        summary3 = viewModel.point3
+                    )
+                    CustomCheckbox(
+                        checked = markedNews.isSaved,
+                        onCheckedChange = { isChecked ->
+                            viewModel.onEvent(NewsDetailEvent.onSaveNewsClick(markedNews, isChecked))
+                        }
+                    )
                 },
                 scrollBehavior = scrollBehavior,
             )
@@ -114,7 +130,11 @@ fun NewsDetailScreen(
 }
 
 @Composable
-fun NewsContent(innerPadding: PaddingValues, viewModel: NewsDetailViewModel, imagePainter: AsyncImagePainter) {
+fun NewsContent(
+    innerPadding: PaddingValues,
+    viewModel: NewsDetailViewModel,
+    imagePainter: AsyncImagePainter
+) {
     Column(modifier = Modifier.padding(innerPadding)) {
         Image(
             painter = imagePainter,
@@ -164,12 +184,14 @@ fun NewsContent(innerPadding: PaddingValues, viewModel: NewsDetailViewModel, ima
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Button(
-            onClick = { /* Handle bookmark button click */ },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(text = "Bookmark")
-        }
+//        Button(
+//            onClick = {
+//                      viewModel.onEvent(NewsDetailEvent.onSaveNewsClick(viewModel))
+//            },
+//            modifier = Modifier.fillMaxWidth()
+//        ) {
+//            Text(text = "Bookmark")
+//        }
     }
 }
 
@@ -178,3 +200,23 @@ fun NewsContent(innerPadding: PaddingValues, viewModel: NewsDetailViewModel, ima
 //fun NewsDetailPage() {
 //    NewsDetailScreen()
 //}
+
+@Composable
+fun CustomCheckbox(
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit
+) {
+    IconButton(onClick = { onCheckedChange(!checked) }) {
+        if (checked) {
+            Icon(
+                imageVector = Icons.Filled.Favorite,
+                contentDescription = "Localized description"
+            )
+        } else {
+            Icon(
+                imageVector = Icons.Filled.FavoriteBorder,
+                contentDescription = "Localized description"
+            )
+        }
+    }
+}

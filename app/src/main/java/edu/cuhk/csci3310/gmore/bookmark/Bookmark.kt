@@ -1,4 +1,4 @@
-package edu.cuhk.csci3310.gmore.screens
+package edu.cuhk.csci3310.gmore.bookmark
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box

@@ -17,7 +17,7 @@ interface MarkedNewsDao {
     suspend fun deleteNews(news: MarkedNews)
 
     @Query("SELECT * FROM markednews WHERE id = :id")
-    suspend fun getNewsById(id: Int): MarkedNews?
+    suspend fun getNewsById(id: String): MarkedNews?
 
     @Query("SELECT * FROM markednews")
     fun getAllMarkedNews(): Flow<List<MarkedNews>>

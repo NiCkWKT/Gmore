@@ -11,7 +11,7 @@ class MarkedNewsRepositoryImpl(private val dao: MarkedNewsDao): MarkedNewsReposi
         dao.deleteNews(news)
     }
 
-    override suspend fun getNewsById(id: Int): MarkedNews? {
+    override suspend fun getNewsById(id: String): MarkedNews? {
         return dao.getNewsById(id)
     }
 

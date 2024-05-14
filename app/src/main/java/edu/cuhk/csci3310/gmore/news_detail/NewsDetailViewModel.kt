@@ -37,8 +37,10 @@ class NewsDetailViewModel @Inject constructor(
 ): ViewModel() {
     private val TAG = "Gmore"
 //    private val _news = MutableStateFlow()
-    var news by mutableStateOf<NewsData?>(null)
+    var news by mutableStateOf<MarkedNews?>(null)
         private set
+
+//    var markedNews = markedRepository.getNewsById(savedStateHandle.get<String>("newsId")!!)
 
 //    val news: StateFlow<NewsData>
 //        get() = _news
@@ -46,6 +48,9 @@ class NewsDetailViewModel @Inject constructor(
     private var _newsUiState: NewsDetailUiState by mutableStateOf(NewsDetailUiState.Empty)
     val newsUiState: NewsDetailUiState
         get() = _newsUiState
+
+    var id by mutableStateOf("")
+        private set
 
     var title by mutableStateOf("")
         private set
@@ -72,6 +77,37 @@ class NewsDetailViewModel @Inject constructor(
         private set
 
 
+    var markedId by mutableStateOf("")
+        private set
+
+    var markedTitle by mutableStateOf("")
+        private set
+
+    var markedPublishedDate by mutableStateOf("")
+        private set
+
+    var markedImageUrl by mutableStateOf("")
+        private set
+
+    var markedSource by mutableStateOf("")
+        private set
+
+    var markedSourceUrl by mutableStateOf("")
+        private set
+
+    var markedPoint1 by mutableStateOf("")
+        private set
+
+    var markedPoint2 by mutableStateOf("")
+        private set
+
+    var markedPoint3 by mutableStateOf("")
+        private set
+
+    var markedIsSaved by mutableStateOf(false)
+        private set
+
+
 
     private val _uiEvent = Channel<UiEvent> {  }
     val uiEvent = _uiEvent.receiveAsFlow()
@@ -89,6 +125,8 @@ class NewsDetailViewModel @Inject constructor(
                     Log.d(TAG, "NewsDetailViewModel getNews: $newsApiResult")
                     if (newsApiResult.success) {
 //                        _news.value = newsApiResult.data
+                        Log.d(TAG, "NewsDetailViewModel getNews success: ${newsApiResult.data}")
+                        id = newsApiResult.data.id
                         title = newsApiResult.data.title
                         publishedDate = newsApiResult.data.published_at
                         imageUrl = newsApiResult.data.image_url
@@ -105,6 +143,19 @@ class NewsDetailViewModel @Inject constructor(
                 } catch (e: Exception) {
                     NewsDetailUiState.Error
                 }
+//                Log.d(TAG, "Marked News ID: $newsId")
+//                markedRepository.getNewsById(newsId)?.let { markedNews ->
+//                    markedTitle = markedNews.title
+//                    markedPublishedDate = markedNews.publishedDate
+//                    markedImageUrl = markedNews.imageUrl
+//                    markedSource = markedNews.source
+//                    markedSourceUrl = markedNews.sourceUrl
+//                    markedPoint1 = markedNews.summary1
+//                    markedPoint2 = markedNews.summary2
+//                    markedPoint3 = markedNews.summary3
+//                    markedIsSaved = markedNews.isSaved
+//                    this@NewsDetailViewModel.news = markedNews
+//                }
             }
         }
     }
@@ -113,24 +164,26 @@ class NewsDetailViewModel @Inject constructor(
         when(event) {
             is NewsDetailEvent.onSaveNewsClick -> {
                 viewModelScope.launch {
-                    val newsData = news
-                    val markedNews = newsData?.let {
-                        MarkedNews(
-                            id = it.id,
-                            title = newsData.title,
-                            publishedDate = newsData.published_at,
-                            imageUrl = newsData.image_url,
-                            summary1 = newsData.summary[0],
-                            summary2 = newsData.summary[1],
-                            summary3 = newsData.summary[2],
-                            source = newsData.source,
-                            sourceUrl = newsData.source_url
-                        )
-                    }
-                    if (markedNews != null) {
-                        markedRepository.saveNews(markedNews)
-                    }
+                    val newsData = event.news.copy(isSaved = event.isSaved)
+//                    val markedNews = newsData?.let {
+//                        MarkedNews(
+//                            id = it.id,
+//                            title = newsData.title,
+//                            publishedDate = newsData.publishedDate,
+//                            imageUrl = newsData.imageUrl,
+//                            summary1 = newsData.summary1,
+//                            summary2 = newsData.summary2,
+//                            summary3 = newsData.sum,
+//                            source = newsData.source,
+//                            sourceUrl = newsData.source_url,
+//                            isSaved = event.isSaved
+//                        )
+//                    }
+                    markedRepository.saveNews(newsData)
                 }
+            }
+            is NewsDetailEvent.onBackClick -> {
+                sendUiEvent(UiEvent.PopBackStack)
             }
         }
     }
