@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 data class MarkedNews(
     val title: String,
     val publishedDate: String,
+    val imageUrl: String,
     val summary1: String,
     val summary2: String,
     val summary3: String,

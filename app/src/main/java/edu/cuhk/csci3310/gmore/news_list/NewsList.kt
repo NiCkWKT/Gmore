@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -28,6 +29,7 @@ import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -40,10 +42,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import coil.compose.rememberAsyncImagePainter
+import edu.cuhk.csci3310.gmore.ScreenRoute
 import edu.cuhk.csci3310.gmore.data.api.model.NewsData
+import edu.cuhk.csci3310.gmore.news_detail.NewsDetailScreen
 import edu.cuhk.csci3310.gmore.ui.theme.OffWhite
 import edu.cuhk.csci3310.gmore.ui.theme.DarkBrown
+import edu.cuhk.csci3310.gmore.util.UiEvent
 
 
 data class TabItem(
@@ -58,14 +69,52 @@ val tabItems = listOf(
     TabItem(title = "Business")
 )
 
+
 @Composable
-fun NewsScreen(newsViewModel: NewsViewModel) {
+fun NewsScreen() {
+    val navController = rememberNavController()
+    NavHost(
+        navController = navController,
+        startDestination = ScreenRoute.News.route
+    ) {
+        composable(ScreenRoute.News.route) {
+            NewsListPage(onNavigate = { navController.navigate(it.route) })
+        }
+        composable(
+            route = ScreenRoute.NewsDetail.route + "?newsId={newsId}",
+            arguments = listOf(
+                navArgument(name = "newsId") {
+                    type = NavType.StringType
+                    defaultValue = "4699eb30-49e7-4133-9254-70a6b9e7774d"
+                }
+            )
+        ) {
+            NewsDetailScreen(onPopBackStack = { navController.popBackStack() })
+        }
+    }
+}
+
+@Composable
+fun NewsListPage(
+    onNavigate: (UiEvent.Navigate) -> Unit,
+    newsViewModel: NewsViewModel = hiltViewModel()
+) {
     val uiState = newsViewModel.newsUiState
     val news by newsViewModel.news.collectAsState()
 
     var selectedTabIndex by remember {
         mutableIntStateOf(0)
     }
+
+    LaunchedEffect(key1 = true) {
+        newsViewModel.uiEvent.collect {event ->
+            when(event) {
+                is UiEvent.Navigate -> onNavigate(event)
+                else -> Unit
+            }
+        }
+    }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -120,7 +169,15 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
                     is NewsUiState.Success -> {
                         items(news) { newsData: NewsData ->
 //                            NewsImageCard(newsData = newsData)
-                            NewsCard(newsData = newsData)
+                            NewsCard(
+                                newsData = newsData,
+                                onEvent = newsViewModel::onEvent,
+                                modifier = Modifier
+                                    .clickable {
+                                        newsViewModel.onEvent(NewsListEvent.onNewsClick(newsData))
+                                    }
+                                    .padding(16.dp)
+                            )
                         }
                     }
 
@@ -141,12 +198,16 @@ fun NewsScreen(newsViewModel: NewsViewModel) {
 }
 
 @Composable
-fun NewsCard(newsData: NewsData) {
+fun NewsCard(
+    newsData: NewsData,
+    onEvent: (NewsListEvent) -> Unit,
+    modifier: Modifier = Modifier
+) {
     val imagerPainter = rememberAsyncImagePainter(model = Uri.parse(newsData.image_url))
 
     Card(
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(16.dp),
+        modifier = modifier, // Modifier.padding(16.dp),
         colors = CardDefaults.cardColors(containerColor = Color.Transparent)
     ) {
         Column{

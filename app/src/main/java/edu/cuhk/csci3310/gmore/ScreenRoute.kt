@@ -21,4 +21,8 @@ sealed class ScreenRoute(
     object LiveCamera : ScreenRoute(
         route = "liveCamera",
     )
+
+    object NewsDetail : ScreenRoute(
+        route = "news_detail"
+    )
 }

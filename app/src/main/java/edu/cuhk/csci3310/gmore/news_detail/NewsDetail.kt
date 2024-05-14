@@ -6,9 +6,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.Button
-import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,113 +18,62 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
+import edu.cuhk.csci3310.gmore.util.UiEvent
+
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewsDetailPage() {
-    val imagerPainter = rememberAsyncImagePainter(model = Uri.parse("https://i.kinja-img.com/image/upload/c_fill,h_675,pg_1,q_80,w_1200/51296027e82e152fdfd347a10bbe2589.jpg"))
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = { Text(text = "News Detail") },
-                navigationIcon = {
-                    IconButton(onClick = { /* Handle navigation icon click */ }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-        }
-    ) {
-        Column(modifier = Modifier.padding(it)) {
-            Image(
-                painter = imagerPainter,
-                contentDescription = "News Image",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(shape = RoundedCornerShape(8.dp))
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "News Summary",
-                style = MaterialTheme.typography.bodySmall,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                text = "Bullet point 1",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Text(
-                text = "Bullet point 2",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Text(
-                text = "Bullet point 3",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "News Source",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Text(
-                text = "Publish Date",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Button(
-                onClick = { /* Handle bookmark button click */ },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Bookmark")
+fun NewsDetailScreen(
+    onPopBackStack: () -> Unit,
+    viewModel: NewsDetailViewModel = hiltViewModel()
+) {
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvent.collect{ event ->
+            when(event) {
+                is UiEvent.PopBackStack -> onPopBackStack()
+                else -> Unit
             }
         }
     }
-}
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun CenterAlignedTopAppBarExample() {
+    val uiState = viewModel.newsUiState
+//    val news by viewModel.news.collectAsState()
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-
+    val imagePainter = rememberAsyncImagePainter(model = Uri.parse(viewModel.imageUrl))
     Scaffold(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
 
         topBar = {
-            CenterAlignedTopAppBar(
+            TopAppBar(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.primary,
                 ),
                 title = {
                     Text(
-                        "Centered Top App Bar",
+                        text = "Detail",
+                        fontSize = 16.sp,
+                        textAlign = TextAlign.Left,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
+                    // TODO: Pop backstack
                     IconButton(onClick = { /* do something */ }) {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
@@ -134,10 +82,11 @@ fun CenterAlignedTopAppBarExample() {
                     }
                 },
                 actions = {
+                    // TODO: add to bookmark
                     IconButton(onClick = { /* do something */ }) {
                         Icon(
-                            imageVector = Icons.Filled.Menu,
-                            contentDescription = "Localized description"
+                            imageVector = Icons.Filled.FavoriteBorder,
+                            contentDescription = "Bookmark bar"
                         )
                     }
                 },
@@ -145,12 +94,87 @@ fun CenterAlignedTopAppBarExample() {
             )
         },
     ) { innerPadding ->
-        Text(text = "Scrollable content", modifier = Modifier.padding(innerPadding))
+        when(uiState)  {
+            NewsDetailUiState.Loading -> {
+                Text("Loading")
+            }
+            NewsDetailUiState.Error -> {
+                Text("Error")
+            }
+            NewsDetailUiState.Success -> {
+                NewsContent(innerPadding, viewModel, imagePainter)
+            }
+            NewsDetailUiState.Empty -> {
+                Text("Empty")
+            }
+
+            else -> {}
+        }
     }
 }
 
-@Preview
 @Composable
-fun NewsPage() {
-    CenterAlignedTopAppBarExample()
+fun NewsContent(innerPadding: PaddingValues, viewModel: NewsDetailViewModel, imagePainter: AsyncImagePainter) {
+    Column(modifier = Modifier.padding(innerPadding)) {
+        Image(
+            painter = imagePainter,
+            contentDescription = "News Image",
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .clip(shape = RoundedCornerShape(8.dp))
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "News Summary",
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        Text(
+            text = viewModel.point1,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            text = viewModel.point2,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            text = viewModel.point3,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = viewModel.source,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Text(
+            text = viewModel.publishedDate,
+            style = MaterialTheme.typography.bodySmall
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Button(
+            onClick = { /* Handle bookmark button click */ },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(text = "Bookmark")
+        }
+    }
 }
+
+//@Preview
+//@Composable
+//fun NewsDetailPage() {
+//    NewsDetailScreen()
+//}

@@ -5,11 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import edu.cuhk.csci3310.gmore.news_list.NewsListPage
+import edu.cuhk.csci3310.gmore.news_list.NewsScreen
 import edu.cuhk.csci3310.gmore.news_list.NewsViewModel
 import edu.cuhk.csci3310.gmore.screens.BookmarkScreen
 import edu.cuhk.csci3310.gmore.screens.Camera.CameraScreen
 import edu.cuhk.csci3310.gmore.screens.Camera.LiveCameraScreen
-import edu.cuhk.csci3310.gmore.news_list.NewsScreen
 
 @Composable
 fun BottomNavGraph(navController: NavHostController, newsViewModel: NewsViewModel) {
@@ -18,7 +19,7 @@ fun BottomNavGraph(navController: NavHostController, newsViewModel: NewsViewMode
         startDestination = ScreenRoute.News.route
     ) {
         composable(route = ScreenRoute.News.route) {
-            NewsScreen(newsViewModel)
+            NewsScreen()
         }
 //        composable(route = ScreenRoute.Profile.route) {
 //            ProfileScreen()
