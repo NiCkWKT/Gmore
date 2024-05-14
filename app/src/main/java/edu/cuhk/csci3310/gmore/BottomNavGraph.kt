@@ -24,7 +24,7 @@ fun BottomNavGraph(navController: NavHostController, newsViewModel: NewsViewMode
 //            ProfileScreen()
 //        }
         composable(route = ScreenRoute.Bookmark.route) {
-            BookmarkScreen()
+            BookmarkScreen(onPopBackStack = { navController.popBackStack() })
         }
         composable(route = ScreenRoute.Camera.route) {
             CameraScreen(navController)
