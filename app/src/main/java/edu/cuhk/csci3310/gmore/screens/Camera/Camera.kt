@@ -211,36 +211,38 @@ fun CameraScreen(navController: NavHostController) {
                     modifier = Modifier.fillMaxWidth(),
                     contentScale = ContentScale.Crop
                 )
-                IconButton(
-                    onClick = {
+                if (uiState == OcrUiState.Empty) {
+                    IconButton(
+                        onClick = {
 //                        val file = File(context.cacheDir,context.contentResolver.openFileDescriptor(selectedImageUri!!, "r", null).toString())
 //                        context.openFileInput("imageTaken.jpg")
-                        val file = when(imageSource) {
-                            is ImageSource.ImagePicker -> selectedImageUri!!.asFile(context)
+                            val file = when(imageSource) {
+                                is ImageSource.ImagePicker -> selectedImageUri!!.asFile(context)
 
-                            is ImageSource.InternalStorage -> {
+                                is ImageSource.InternalStorage -> {
 //                                val stream = context.openFileInput("imageTaken.jpg")
 //                                val bytes = stream.readBytes()
 //                                val bmp = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
 //                                File(context.cacheDir,context.contentResolver.openFileDescriptor(selectedImageUri!!, "r", null).toString())
-                                File(context.getFilesDir(),"imageTaken.jpg")
+                                    File(context.getFilesDir(),"imageTaken.jpg")
+                                }
+                                null -> null
                             }
-                            null -> null
-                        }
 //                        val file = selectedImageUri!!.asFile(context)
-                        ocrViewModel.getSummaries(file!!)
-                    },
-                    modifier = Modifier
-                        .align(alignment = Alignment.End)
-                        .padding(top = 10.dp, end = 10.dp, bottom = 10.dp),
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = Color.Red
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Send,
-                        contentDescription = "Send image to OCR"
-                    )
+                            ocrViewModel.getSummaries(file!!)
+                        },
+                        modifier = Modifier
+                            .align(alignment = Alignment.End)
+                            .padding(top = 10.dp, end = 10.dp, bottom = 10.dp),
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = Color.Red
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Send,
+                            contentDescription = "Send image to OCR"
+                        )
+                    }
                 }
 
                 when(uiState) {
@@ -253,7 +255,11 @@ fun CameraScreen(navController: NavHostController) {
                     }
 
                     is OcrUiState.Success -> {
-                        NewsSummaryView(newsDataSummary = ocrSummaries)
+                        Column(
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            NewsSummaryView(newsDataSummary = ocrSummaries)
+                        }
                     }
 
                     is OcrUiState.Error -> {
